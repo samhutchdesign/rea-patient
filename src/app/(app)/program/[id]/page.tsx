@@ -1,5 +1,5 @@
 'use client';
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -16,11 +16,82 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
+import GraphicEqRoundedIcon from '@mui/icons-material/GraphicEqRounded';
 import { mockProgram, mockExercises, mockPatient, mockPhysio } from '@/lib/mock-data';
 import { useNotes, addNote } from '@/lib/noteStore';
 import { useCompleted, toggleComplete } from '@/lib/completionStore';
 
 const TODAY = '2026-06-02';
+
+function PhysioAudioCard({ note }: { note: { from: string; duration: string; transcriptPreview: string } }) {
+  const [playing, setPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (!playing) return;
+    const interval = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 1) { setPlaying(false); return 0; }
+        return p + 0.014;
+      });
+    }, 100);
+    return () => clearInterval(interval);
+  }, [playing]);
+
+  const waveHeights = [10, 16, 22, 14, 18, 26, 12, 20, 24, 16, 22, 10, 18, 28, 14, 20, 16, 24, 12, 18, 22, 14, 26, 10, 16, 20, 24, 12];
+
+  return (
+    <Card sx={{ mb: 2, bgcolor: 'primary.light' }}>
+      <CardContent sx={{ pb: '14px !important', pt: '14px !important' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.25 }}>
+          <GraphicEqRoundedIcon sx={{ color: 'primary.main', fontSize: 18, flexShrink: 0 }} />
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="caption" fontWeight={700} color="primary.main" sx={{ display: 'block', lineHeight: 1.2 }}>
+              Note from {note.from}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: 10 }}>{note.duration}</Typography>
+          </Box>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <IconButton
+            size="small"
+            onClick={() => setPlaying(!playing)}
+            sx={{ bgcolor: 'primary.main', color: 'primary.contrastText', '&:hover': { bgcolor: 'primary.main', opacity: 0.9 }, width: 34, height: 34, flexShrink: 0 }}
+          >
+            {playing ? <PauseRoundedIcon sx={{ fontSize: 18 }} /> : <PlayArrowRoundedIcon sx={{ fontSize: 18 }} />}
+          </IconButton>
+          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: '2px', height: 28 }}>
+            {waveHeights.map((h, i) => {
+              const barProgress = i / waveHeights.length;
+              const active = playing && barProgress <= progress;
+              return (
+                <Box
+                  key={i}
+                  sx={{
+                    width: 3,
+                    borderRadius: 1,
+                    bgcolor: active ? 'primary.main' : 'divider',
+                    height: `${h}px`,
+                    transition: 'background-color 0.1s',
+                    animation: playing && barProgress <= progress && barProgress > progress - 0.05
+                      ? 'wavePulse 0.4s ease-in-out infinite alternate'
+                      : 'none',
+                  }}
+                />
+              );
+            })}
+          </Box>
+        </Box>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, fontStyle: 'italic', pl: 0.5 }}>
+          "{note.transcriptPreview}"
+        </Typography>
+      </CardContent>
+      <style>{`@keyframes wavePulse { from { transform: scaleY(0.8); } to { transform: scaleY(1.2); } }`}</style>
+    </Card>
+  );
+}
 
 export default function ExerciseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -94,6 +165,9 @@ export default function ExerciseDetailPage({ params }: { params: Promise<{ id: s
         </Box>
 
         <Typography variant="body2" color="text.secondary" mb={1.5}>{ex.description}</Typography>
+
+        {/* Physio audio note */}
+        {ex.physioAudioNote && <PhysioAudioCard note={ex.physioAudioNote} />}
 
         <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap', mb: 2 }}>
           <Chip label={`${pe.sets} sets`} size="small" sx={{ bgcolor: 'primary.light', color: 'primary.main', fontWeight: 500 }} />

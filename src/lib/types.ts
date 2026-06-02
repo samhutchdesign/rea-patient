@@ -11,6 +11,7 @@ export interface Exercise {
   defaultFrequency: 'Daily' | '2x Daily' | 'Every Other Day' | '3x Weekly';
   videoUrl?: string;
   imageUrl?: string;
+  physioAudioNote?: { from: string; duration: string; transcriptPreview: string };
 }
 
 export interface ProgramExercise {
@@ -26,6 +27,8 @@ export interface Program {
   name: string;
   description: string;
   exercises: ProgramExercise[];
+  inPersonSessionsCompleted?: number;
+  inPersonSessionsTotal?: number;
 }
 
 export interface Patient {
@@ -38,6 +41,7 @@ export interface Patient {
   avatarInitials: string;
   condition: string;
   conditionDetail: string;
+  goal?: string;
 }
 
 export interface Physio {
@@ -83,4 +87,5 @@ export interface Notification {
   timestamp: string;
   read: boolean;
   type: 'program_update' | 'reminder' | 'message';
+  link?: string;
 }

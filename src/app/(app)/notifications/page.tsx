@@ -1,4 +1,5 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
@@ -25,6 +26,7 @@ function formatRelative(ts: string) {
 }
 
 export default function NotificationsPage() {
+  const router = useRouter();
   const unread = mockNotifications.filter((n) => !n.read).length;
 
   return (
@@ -39,7 +41,16 @@ export default function NotificationsPage() {
           const Icon = typeIcon[notif.type];
           return (
             <Box key={notif.id}>
-              <Box sx={{ px: 2, py: 1.75, display: 'flex', gap: 1.5, alignItems: 'flex-start', bgcolor: !notif.read ? 'action.hover' : 'transparent' }}>
+              <Box
+                onClick={() => notif.link && router.push(notif.link)}
+                sx={{
+                  px: 2, py: 1.75, display: 'flex', gap: 1.5, alignItems: 'flex-start',
+                  bgcolor: !notif.read ? 'action.hover' : 'transparent',
+                  cursor: notif.link ? 'pointer' : 'default',
+                  '&:hover': notif.link ? { bgcolor: 'action.selected' } : {},
+                  transition: 'background-color 0.15s',
+                }}
+              >
                 <Box sx={{ width: 32, height: 32, borderRadius: '50%', bgcolor: 'primary.light', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, mt: 0.25 }}>
                   <Icon sx={{ fontSize: 16, color: 'primary.main' }} />
                 </Box>

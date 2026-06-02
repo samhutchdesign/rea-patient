@@ -10,6 +10,7 @@ export const mockPatient: Patient = {
   avatarInitials: 'MC',
   condition: 'Postpartum Pelvic Floor Rehabilitation',
   conditionDetail: 'Postpartum pelvic floor hypotonicity with stress urinary incontinence (SUI), 6 weeks post-delivery.',
+  goal: 'Return to yoga and running, leak-free, by 8 weeks postpartum.',
 };
 
 export const mockPhysio: Physio = {
@@ -57,6 +58,11 @@ export const mockExercises: Exercise[] = [
     defaultSets: 3, defaultReps: 10, defaultHoldSecs: 5,
     defaultFrequency: 'Daily',
     videoUrl: 'YQmpNBBioAo',
+    physioAudioNote: {
+      from: 'Sarah Harper',
+      duration: '1:12',
+      transcriptPreview: 'Remember to breathe out slowly and really let that belly drop before you even think about the pelvic floor lift…',
+    },
   },
   {
     id: 'ex3',
@@ -131,6 +137,8 @@ export const mockProgram: Program = {
     { exerciseId: 'ex3', sets: 3, reps: 10, holdSecs: 8, frequency: 'Daily' },
     { exerciseId: 'ex5', sets: 3, reps: 12, holdSecs: 3, frequency: 'Daily' },
   ],
+  inPersonSessionsCompleted: 3,
+  inPersonSessionsTotal: 12,
 };
 
 export const mockNotes: ExerciseNote[] = [
@@ -169,10 +177,10 @@ export const mockNotes: ExerciseNote[] = [
 ];
 
 export const mockNotifications: Notification[] = [
-  { id: 'notif1', message: 'Sarah Harper updated your exercise program. Hip Bridge reps increased to 15.', timestamp: '2026-05-28T09:00:00Z', read: false, type: 'program_update' },
-  { id: 'notif2', message: "Great work this week — you've completed 6 of 7 days! Keep it up.", timestamp: '2026-05-25T08:00:00Z', read: false, type: 'reminder' },
-  { id: 'notif3', message: 'Reminder: You have not logged your exercises today.', timestamp: '2026-05-22T18:00:00Z', read: true, type: 'reminder' },
-  { id: 'notif4', message: 'Sarah Harper replied to your note on Pelvic Floor Contractions.', timestamp: '2026-05-09T14:30:00Z', read: true, type: 'message' },
+  { id: 'notif1', message: 'Sarah Harper updated your exercise program. Hip Bridge reps increased to 15.', timestamp: '2026-05-28T09:00:00Z', read: false, type: 'program_update', link: '/program' },
+  { id: 'notif2', message: "Great work this week — you've completed 6 of 7 days! Keep it up.", timestamp: '2026-05-25T08:00:00Z', read: false, type: 'reminder', link: '/stats' },
+  { id: 'notif3', message: 'Reminder: You have not logged your exercises today.', timestamp: '2026-05-22T18:00:00Z', read: true, type: 'reminder', link: '/today' },
+  { id: 'notif4', message: 'Sarah Harper replied to your note on Pelvic Floor Contractions.', timestamp: '2026-05-09T14:30:00Z', read: true, type: 'message', link: '/program/ex3' },
   { id: 'notif5', message: 'Your next appointment is May 30 at 10:00 AM.', timestamp: '2026-05-08T09:00:00Z', read: true, type: 'reminder' },
 ];
 

@@ -1,17 +1,27 @@
+'use client';
+import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import IconButton from '@mui/material/IconButton';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { mockClinic } from '@/lib/mock-data';
 
 export default function ClinicPage() {
+  const router = useRouter();
   return (
     <Box sx={{ px: 2.5, pt: 3 }}>
-      <Typography variant="h5" fontWeight={700} mb={3}>Clinic Info</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+        <IconButton size="small" onClick={() => router.back()} sx={{ mr: 0.5 }}>
+          <ArrowBackRoundedIcon fontSize="small" />
+        </IconButton>
+        <Typography variant="h5" fontWeight={700}>Clinic Info</Typography>
+      </Box>
 
       <Card>
         <CardContent>
