@@ -4,7 +4,6 @@ import type { ExerciseNote } from './types';
 
 const notesMap = new Map<string, ExerciseNote[]>();
 
-// Seed from mock data
 for (const note of mockNotes) {
   const existing = notesMap.get(note.exerciseId) ?? [];
   notesMap.set(note.exerciseId, [...existing, note]);
@@ -20,6 +19,18 @@ export function getNotes(exerciseId: string): ExerciseNote[] {
 export function addNote(note: ExerciseNote): void {
   const existing = notesMap.get(note.exerciseId) ?? [];
   notesMap.set(note.exerciseId, [...existing, note]);
+  notify();
+}
+
+export function editNote(noteId: string, exerciseId: string, content: string): void {
+  const existing = notesMap.get(exerciseId) ?? [];
+  notesMap.set(exerciseId, existing.map((n) => n.id === noteId ? { ...n, content } : n));
+  notify();
+}
+
+export function deleteNote(noteId: string, exerciseId: string): void {
+  const existing = notesMap.get(exerciseId) ?? [];
+  notesMap.set(exerciseId, existing.filter((n) => n.id !== noteId));
   notify();
 }
 

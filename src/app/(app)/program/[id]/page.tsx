@@ -13,11 +13,15 @@ import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import GraphicEqRoundedIcon from '@mui/icons-material/GraphicEqRounded';
 import { mockProgram, mockExercises, mockPatient, mockPhysio } from '@/lib/mock-data';
-import { useNotes, addNote } from '@/lib/noteStore';
+import { useNotes, addNote, editNote, deleteNote } from '@/lib/noteStore';
 
 const TODAY = '2026-06-02';
 
@@ -108,6 +112,8 @@ export default function ExerciseDetailPage({ params }: { params: Promise<{ id: s
   const pe = mockProgram.exercises.find((p) => p.exerciseId === id);
   const notes = useNotes(id);
   const [noteText, setNoteText] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
 
   if (!ex || !pe) return <Box sx={{ p: 3 }}><Typography>Exercise not found.</Typography></Box>;
 
@@ -204,6 +210,7 @@ export default function ExerciseDetailPage({ params }: { params: Promise<{ id: s
           <Card sx={{ mb: 1.5 }}>
             {notes.map((note, i) => {
               const isPhysio = note.authorRole === 'physio';
+              const isEditing = editingId === note.id;
               return (
                 <Box key={note.id}>
                   <Box sx={{ px: 2, py: 1.5 }}>
@@ -214,8 +221,61 @@ export default function ExerciseDetailPage({ params }: { params: Promise<{ id: s
                       <Typography variant="caption" fontWeight={600}>{note.authorName}</Typography>
                       {isPhysio && <Chip label="Physio" size="small" sx={{ height: 16, fontSize: 9, bgcolor: 'primary.light', color: 'primary.main' }} />}
                       <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto' }}>{note.createdAt}</Typography>
+                      {!isPhysio && !isEditing && (
+                        <Box sx={{ display: 'flex', gap: 0.25 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => { setEditingId(note.id); setEditText(note.content); }}
+                            sx={{ p: 0.25, color: 'text.secondary' }}
+                          >
+                            <EditRoundedIcon sx={{ fontSize: 14 }} />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => deleteNote(note.id, id)}
+                            sx={{ p: 0.25, color: 'text.secondary' }}
+                          >
+                            <DeleteOutlineRoundedIcon sx={{ fontSize: 14 }} />
+                          </IconButton>
+                        </Box>
+                      )}
                     </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ pl: 4, lineHeight: 1.5 }}>{note.content}</Typography>
+                    {isEditing ? (
+                      <Box sx={{ pl: 4 }}>
+                        <TextField
+                          multiline
+                          size="small"
+                          fullWidth
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                          autoFocus
+                          sx={{ mb: 1 }}
+                        />
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            disableElevation
+                            startIcon={<CheckRoundedIcon sx={{ fontSize: 14 }} />}
+                            onClick={() => { editNote(note.id, id, editText.trim()); setEditingId(null); }}
+                            disabled={!editText.trim()}
+                            sx={{ fontSize: 12 }}
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            size="small"
+                            startIcon={<CloseRoundedIcon sx={{ fontSize: 14 }} />}
+                            onClick={() => setEditingId(null)}
+                            sx={{ fontSize: 12 }}
+                          >
+                            Cancel
+                          </Button>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary" sx={{ pl: 4, lineHeight: 1.5 }}>{note.content}</Typography>
+                    )}
                   </Box>
                   {i < notes.length - 1 && <Divider />}
                 </Box>
