@@ -1,22 +1,20 @@
 'use client';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import LinearProgress from '@mui/material/LinearProgress';
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded';
+import IconButton from '@mui/material/IconButton';
+import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
+import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import { mockProgram } from '@/lib/mock-data';
 import { useCompleted, useCompletionHistory, computeStreak } from '@/lib/completionStore';
 
 const TODAY = '2026-06-02';
+const BASE_YEAR = 2026;
+const BASE_MONTH = 6; // June, 1-indexed
 const TOTAL_EXERCISES = mockProgram.exercises.length;
-
-// Calendar config — June 2026 starts on Monday
-const MONTH_LABEL = 'June 2026';
-const MONTH_START = '2026-06';
-const DAYS_IN_MONTH = 30;
-const FIRST_DAY_OFFSET = 0; // Monday = 0
 const WEEK_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 function formatDate(d: string) {
@@ -28,7 +26,7 @@ function DayCircle({ dateStr, count, isToday, isFuture }: { dateStr: string; cou
   const r = 13;
   const circ = 2 * Math.PI * r;
   const filled = isFuture ? 0 : (count / TOTAL_EXERCISES) * circ;
-  const color = count === TOTAL_EXERCISES ? '#2E7D32' : '#6750A4';
+  const strokeColor = count === TOTAL_EXERCISES ? '#2E7D32' : '#6750A4';
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -38,7 +36,7 @@ function DayCircle({ dateStr, count, isToday, isFuture }: { dateStr: string; cou
           {!isFuture && count > 0 && (
             <circle
               cx="17" cy="17" r={r} fill="none"
-              stroke={color}
+              stroke={strokeColor}
               strokeWidth="2.5"
               strokeDasharray={`${filled} ${circ}`}
               strokeLinecap="round"
@@ -65,21 +63,36 @@ export default function StatsPage() {
   const todayCompleted = useCompleted(TODAY);
   const todayCount = todayCompleted.size;
   const streak = computeStreak(TODAY);
-  const totalCompleted = history.reduce((acc, h) => acc + h.count, 0) + (history.find(h => h.date === TODAY) ? 0 : todayCount);
+  const totalCompleted = history.reduce((acc, h) => acc + h.count, 0);
 
   const { inPersonSessionsCompleted = 3, inPersonSessionsTotal = 12 } = mockProgram;
   const sessionPct = Math.round((inPersonSessionsCompleted / inPersonSessionsTotal) * 100);
 
-  // Build date → count map for calendar
+  // Month navigation (0 = current month, -1 = last month, etc.)
+  const [monthOffset, setMonthOffset] = useState(0);
+  const canGoForward = monthOffset < 0;
+  const canGoBack = monthOffset > -11;
+
+  // Compute displayed month
+  const rawMonth = BASE_MONTH - 1 + monthOffset; // 0-indexed from Jan
+  const displayYear = BASE_YEAR + Math.floor(rawMonth / 12);
+  const displayMonth = ((rawMonth % 12) + 12) % 12; // 0-indexed
+  const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
+  const firstDayJS = new Date(displayYear, displayMonth, 1).getDay(); // 0=Sun
+  const firstDayMon = (firstDayJS + 6) % 7; // Mon=0
+  const monthLabel = new Date(displayYear, displayMonth, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const monthPrefix = `${displayYear}-${String(displayMonth + 1).padStart(2, '0')}`;
+
+  // Build history map
   const historyMap = new Map<string, number>();
   for (const entry of history) historyMap.set(entry.date, entry.count);
   historyMap.set(TODAY, todayCount);
 
-  // Build calendar grid
+  // Build calendar cells
   const calendarCells: (string | null)[] = [];
-  for (let i = 0; i < FIRST_DAY_OFFSET; i++) calendarCells.push(null);
-  for (let d = 1; d <= DAYS_IN_MONTH; d++) {
-    calendarCells.push(`${MONTH_START}-${String(d).padStart(2, '0')}`);
+  for (let i = 0; i < firstDayMon; i++) calendarCells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) {
+    calendarCells.push(`${monthPrefix}-${String(d).padStart(2, '0')}`);
   }
   while (calendarCells.length % 7 !== 0) calendarCells.push(null);
 
@@ -138,13 +151,10 @@ export default function StatsPage() {
         </CardContent>
       </Card>
 
-      {/* Today's entry only — no title */}
+      {/* Today's entry — no icon, no title */}
       <Card sx={{ mb: 3 }}>
         <Box sx={{ px: 2, py: 1.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.75 }}>
-            {todayCount === TOTAL_EXERCISES
-              ? <CheckCircleRoundedIcon sx={{ fontSize: 18, color: 'success.main', flexShrink: 0 }} />
-              : <RadioButtonUncheckedRoundedIcon sx={{ fontSize: 18, color: 'text.secondary', flexShrink: 0 }} />}
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.75 }}>
             <Typography variant="body2" fontWeight={500}>{formatDate(TODAY)}</Typography>
             <Box sx={{ ml: 'auto' }}>
               <Typography variant="caption" color={todayCount === TOTAL_EXERCISES ? 'success.main' : 'text.secondary'} fontWeight={600}>
@@ -155,16 +165,24 @@ export default function StatsPage() {
           <LinearProgress
             variant="determinate"
             value={Math.round((todayCount / TOTAL_EXERCISES) * 100)}
-            sx={{ height: 4, borderRadius: 2, bgcolor: 'action.hover', ml: 3.5, '& .MuiLinearProgress-bar': { borderRadius: 2, bgcolor: todayCount === TOTAL_EXERCISES ? 'success.main' : 'primary.main' } }}
+            sx={{ height: 4, borderRadius: 2, bgcolor: 'action.hover', '& .MuiLinearProgress-bar': { borderRadius: 2, bgcolor: todayCount === TOTAL_EXERCISES ? 'success.main' : 'primary.main' } }}
           />
         </Box>
       </Card>
 
-      {/* Monthly calendar */}
-      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 1 }}>
-        {MONTH_LABEL}
-      </Typography>
-      <Card sx={{ mt: 1 }}>
+      {/* Monthly calendar with navigation */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+        <IconButton size="small" onClick={() => setMonthOffset((o) => o - 1)} disabled={!canGoBack}>
+          <ChevronLeftRoundedIcon fontSize="small" />
+        </IconButton>
+        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: 1 }}>
+          {monthLabel}
+        </Typography>
+        <IconButton size="small" onClick={() => setMonthOffset((o) => o + 1)} disabled={!canGoForward}>
+          <ChevronRightRoundedIcon fontSize="small" />
+        </IconButton>
+      </Box>
+      <Card>
         <CardContent sx={{ pb: '16px !important' }}>
           {/* Week day headers */}
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', mb: 0.5 }}>

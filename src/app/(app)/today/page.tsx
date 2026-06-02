@@ -8,7 +8,6 @@ import CardContent from '@mui/material/CardContent';
 import LinearProgress from '@mui/material/LinearProgress';
 import Checkbox from '@mui/material/Checkbox';
 import Divider from '@mui/material/Divider';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -21,6 +20,14 @@ import { useCompleted, toggleComplete } from '@/lib/completionStore';
 const TODAY = '2026-06-02';
 
 const CONFETTI_COLORS = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#C77DFF', '#FF9F1C'];
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return 'Good morning,';
+  if (hour >= 12 && hour < 17) return 'Good afternoon,';
+  if (hour >= 17 && hour < 21) return 'Good evening,';
+  return 'Good night,';
+}
 
 function formatDate(d: string) {
   return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -49,28 +56,12 @@ export default function TodayPage() {
 
   return (
     <Box sx={{ px: 2.5, pt: 3, pb: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-        <Box>
-          <Typography variant="h5" fontWeight={700}>Good morning,</Typography>
-          <Typography variant="h5" fontWeight={700} color="primary">{mockPatient.firstName} 👋</Typography>
-          <Typography variant="caption" color="text.secondary">{formatDate(TODAY)}</Typography>
-        </Box>
-        <Avatar sx={{ bgcolor: 'primary.light', color: 'primary.main', fontWeight: 700, width: 44, height: 44 }}>
-          {mockPatient.avatarInitials}
-        </Avatar>
+      {/* Header — no avatar */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h5" fontWeight={700}>{getGreeting()}</Typography>
+        <Typography variant="h5" fontWeight={700} color="primary">{mockPatient.firstName} 👋</Typography>
+        <Typography variant="caption" color="text.secondary">{formatDate(TODAY)}</Typography>
       </Box>
-
-      {/* Goal card */}
-      {mockPatient.goal && (
-        <Card sx={{ mb: 2, bgcolor: 'primary.light' }}>
-          <CardContent sx={{ pb: '14px !important', pt: '14px !important' }}>
-            <Typography variant="caption" color="primary.main" fontWeight={700} sx={{ textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 0.5 }}>
-              🎯 Your Goal
-            </Typography>
-            <Typography variant="body2" fontWeight={500}>{mockPatient.goal}</Typography>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Progress card */}
       <Card sx={{ mb: 3 }}>
@@ -94,23 +85,24 @@ export default function TodayPage() {
         </CardContent>
       </Card>
 
+      {/* Exercise list */}
       <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 1 }}>
         {mockProgram.name}
       </Typography>
-      <Card sx={{ mt: 1 }}>
+      <Card sx={{ mt: 1, mb: 3 }}>
         {exercises.map(({ pe, ex }, i) => {
           const done = completed.has(ex.id);
           return (
             <Box key={ex.id}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2, py: 1.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1.5, py: 1 }}>
                 <Checkbox
                   checked={done}
                   onChange={() => toggleComplete(TODAY, ex.id)}
-                  icon={<RadioButtonUncheckedRoundedIcon />}
-                  checkedIcon={<CheckCircleRoundedIcon />}
-                  sx={{ p: 0.5, color: 'text.secondary', '&.Mui-checked': { color: 'success.main' } }}
+                  icon={<RadioButtonUncheckedRoundedIcon sx={{ fontSize: 28 }} />}
+                  checkedIcon={<CheckCircleRoundedIcon sx={{ fontSize: 28 }} />}
+                  sx={{ p: 1, color: 'text.secondary', '&.Mui-checked': { color: 'success.main' } }}
                 />
-                <Box sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => router.push(`/program/${ex.id}`)}>
+                <Box sx={{ flexGrow: 1, cursor: 'pointer', py: 0.5 }} onClick={() => router.push(`/program/${ex.id}`)}>
                   <Typography variant="body2" fontWeight={600} sx={{ textDecoration: done ? 'line-through' : 'none', color: done ? 'text.secondary' : 'text.primary' }}>
                     {ex.name}
                   </Typography>
@@ -128,7 +120,19 @@ export default function TodayPage() {
         })}
       </Card>
 
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2, textAlign: 'center' }}>
+      {/* Goal card — bottom */}
+      {mockPatient.goal && (
+        <Card sx={{ mb: 2, bgcolor: 'primary.light' }}>
+          <CardContent sx={{ pb: '14px !important', pt: '14px !important' }}>
+            <Typography variant="caption" color="primary.main" fontWeight={700} sx={{ textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 0.5 }}>
+              🎯 Your Goal
+            </Typography>
+            <Typography variant="body2" fontWeight={500}>{mockPatient.goal}</Typography>
+          </CardContent>
+        </Card>
+      )}
+
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, textAlign: 'center' }}>
         Tap an exercise to view details or leave a note for {mockPhysio.firstName}.
       </Typography>
 

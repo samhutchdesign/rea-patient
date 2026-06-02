@@ -11,7 +11,7 @@ export interface Exercise {
   defaultFrequency: 'Daily' | '2x Daily' | 'Every Other Day' | '3x Weekly';
   videoUrl?: string;
   imageUrl?: string;
-  physioAudioNote?: { from: string; duration: string; transcriptPreview: string };
+  physioAudioNote?: { from: string; duration: string; transcriptPreview: string; fullTranscript?: string };
 }
 
 export interface ProgramExercise {

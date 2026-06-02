@@ -25,9 +25,10 @@ import { useCompleted, toggleComplete } from '@/lib/completionStore';
 
 const TODAY = '2026-06-02';
 
-function PhysioAudioCard({ note }: { note: { from: string; duration: string; transcriptPreview: string } }) {
+function PhysioAudioCard({ note }: { note: { from: string; duration: string; transcriptPreview: string; fullTranscript?: string } }) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (!playing) return;
@@ -84,9 +85,20 @@ function PhysioAudioCard({ note }: { note: { from: string; duration: string; tra
             })}
           </Box>
         </Box>
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, fontStyle: 'italic', pl: 0.5 }}>
-          "{note.transcriptPreview}"
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, fontStyle: 'italic', pl: 0.5, lineHeight: 1.5 }}>
+          "{expanded && note.fullTranscript ? note.fullTranscript : note.transcriptPreview}"
         </Typography>
+        {note.fullTranscript && (
+          <Typography
+            variant="caption"
+            color="primary.main"
+            fontWeight={600}
+            onClick={() => setExpanded(!expanded)}
+            sx={{ display: 'block', mt: 0.5, pl: 0.5, cursor: 'pointer', textDecoration: 'underline', textDecorationStyle: 'dotted' }}
+          >
+            {expanded ? 'See less' : 'See more'}
+          </Typography>
+        )}
       </CardContent>
       <style>{`@keyframes wavePulse { from { transform: scaleY(0.8); } to { transform: scaleY(1.2); } }`}</style>
     </Card>
@@ -183,8 +195,8 @@ export default function ExerciseDetailPage({ params }: { params: Promise<{ id: s
             <Typography variant="subtitle2" fontWeight={600} mb={1.5}>How to do it</Typography>
             {ex.instructions.map((step, i) => (
               <Box key={i} sx={{ display: 'flex', gap: 1.5, mb: 1 }}>
-                <Box sx={{ width: 20, height: 20, borderRadius: '50%', bgcolor: 'primary.light', color: 'primary.main', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, mt: 0.1 }}>
-                  <Typography variant="caption" fontWeight={700} sx={{ fontSize: 10 }}>{i + 1}</Typography>
+                <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'primary.light', color: 'primary.main', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, mt: 0.1 }}>
+                  <Typography fontWeight={700} sx={{ fontSize: 13, color: 'primary.main', lineHeight: 1 }}>{i + 1}</Typography>
                 </Box>
                 <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{step}</Typography>
               </Box>

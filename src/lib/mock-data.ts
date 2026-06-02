@@ -57,11 +57,12 @@ export const mockExercises: Exercise[] = [
     tags: { specialty: ['Pelvic Floor'], condition: ['SUI', 'Postpartum'], bodyPart: ['Pelvic Floor', 'Core'], muscle: ['Diaphragm', 'Pelvic Floor Muscles'], surgery: [] },
     defaultSets: 3, defaultReps: 10, defaultHoldSecs: 5,
     defaultFrequency: 'Daily',
-    videoUrl: 'YQmpNBBioAo',
+    videoUrl: 'qKlpKyT1H84',
     physioAudioNote: {
       from: 'Sarah Harper',
       duration: '1:12',
       transcriptPreview: 'Remember to breathe out slowly and really let that belly drop before you even think about the pelvic floor lift…',
+      fullTranscript: "Remember to breathe out slowly and really let that belly drop before you even think about the pelvic floor lift. A lot of patients rush the exhale — take the full 4 to 5 seconds. You should feel your ribcage expand outward and your belly rise on the inhale, not your chest. Then on the exhale, think of a slow elevator coming down — that's your pelvic floor gently releasing and then lifting with the breath. Let gravity do the work on the release phase first. If you feel any bearing down or pressure, pause and reset your breath.",
     },
   },
   {

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Badge from '@mui/material/Badge';
-import FitnessCenterRoundedIcon from '@mui/icons-material/FitnessCenterRounded';
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import TodayRoundedIcon from '@mui/icons-material/TodayRounded';
 import EqualizerRoundedIcon from '@mui/icons-material/EqualizerRounded';
@@ -12,7 +12,7 @@ import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import { mockNotifications } from '@/lib/mock-data';
 
 const navItems = [
-  { label: 'Program', href: '/program', icon: FitnessCenterRoundedIcon },
+  { label: 'Learn', href: '/education', icon: MenuBookRoundedIcon },
   { label: 'Alerts', href: '/notifications', icon: NotificationsOutlinedIcon },
   { label: 'Today', href: '/today', icon: TodayRoundedIcon, center: true },
   { label: 'Stats', href: '/stats', icon: EqualizerRoundedIcon },
@@ -47,6 +47,8 @@ export default function BottomNav() {
           ? pathname === '/today' || pathname === '/'
           : href === '/stats'
           ? pathname === '/stats' || pathname === '/history'
+          : href === '/education'
+          ? pathname === '/education' || pathname.startsWith('/program')
           : pathname.startsWith(href);
 
         if (center) {
