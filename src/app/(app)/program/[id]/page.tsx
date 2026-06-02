@@ -11,17 +11,13 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
-import Checkbox from '@mui/material/Checkbox';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import GraphicEqRoundedIcon from '@mui/icons-material/GraphicEqRounded';
 import { mockProgram, mockExercises, mockPatient, mockPhysio } from '@/lib/mock-data';
 import { useNotes, addNote } from '@/lib/noteStore';
-import { useCompleted, toggleComplete } from '@/lib/completionStore';
 
 const TODAY = '2026-06-02';
 
@@ -111,8 +107,6 @@ export default function ExerciseDetailPage({ params }: { params: Promise<{ id: s
   const ex = mockExercises.find((e) => e.id === id);
   const pe = mockProgram.exercises.find((p) => p.exerciseId === id);
   const notes = useNotes(id);
-  const completed = useCompleted(TODAY);
-  const done = completed.has(id);
   const [noteText, setNoteText] = useState('');
 
   if (!ex || !pe) return <Box sx={{ p: 3 }}><Typography>Exercise not found.</Typography></Box>;
@@ -159,22 +153,8 @@ export default function ExerciseDetailPage({ params }: { params: Promise<{ id: s
       </Box>
 
       <Box sx={{ px: 2.5, pt: 2.5, pb: 3 }}>
-        {/* Title + complete toggle */}
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="h6" fontWeight={700} sx={{ flex: 1, pr: 1 }}>{ex.name}</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Checkbox
-              checked={done}
-              onChange={() => toggleComplete(TODAY, id)}
-              icon={<RadioButtonUncheckedRoundedIcon />}
-              checkedIcon={<CheckCircleRoundedIcon />}
-              sx={{ p: 0.5, color: 'text.secondary', '&.Mui-checked': { color: 'success.main' } }}
-            />
-            <Typography variant="caption" color={done ? 'success.main' : 'text.secondary'} sx={{ fontWeight: done ? 600 : 400 }}>
-              {done ? 'Done' : 'Mark done'}
-            </Typography>
-          </Box>
-        </Box>
+        {/* Title */}
+        <Typography variant="h6" fontWeight={700} mb={1}>{ex.name}</Typography>
 
         <Typography variant="body2" color="text.secondary" mb={1.5}>{ex.description}</Typography>
 
