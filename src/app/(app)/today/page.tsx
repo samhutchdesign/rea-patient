@@ -18,8 +18,10 @@ import { mockPatient, mockPhysio, mockProgram, mockExercises } from '@/lib/mock-
 import { useCompleted, toggleComplete } from '@/lib/completionStore';
 
 const TODAY = '2026-06-02';
-
 const CONFETTI_COLORS = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#C77DFF', '#FF9F1C'];
+
+// Module-level flag — survives remounts (navigating away and back)
+let celebrationShown = false;
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -38,7 +40,6 @@ export default function TodayPage() {
   const completed = useCompleted(TODAY);
   const [celebrating, setCelebrating] = useState(false);
   const prevAllDone = useRef(false);
-  const hasShownCelebration = useRef(false);
 
   const exercises = mockProgram.exercises.map((pe) => ({
     pe,
@@ -49,9 +50,9 @@ export default function TodayPage() {
   const allDone = doneCount === exercises.length;
 
   useEffect(() => {
-    if (allDone && !prevAllDone.current && !hasShownCelebration.current) {
+    if (allDone && !prevAllDone.current && !celebrationShown) {
       setCelebrating(true);
-      hasShownCelebration.current = true;
+      celebrationShown = true;
     }
     prevAllDone.current = allDone;
   }, [allDone]);
