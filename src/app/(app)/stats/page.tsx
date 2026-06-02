@@ -17,9 +17,6 @@ const BASE_MONTH = 6; // June, 1-indexed
 const TOTAL_EXERCISES = mockProgram.exercises.length;
 const WEEK_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-function formatDate(d: string) {
-  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-}
 
 function DayCircle({ dateStr, count, isToday, isFuture }: { dateStr: string; count: number; isToday: boolean; isFuture: boolean }) {
   const day = parseInt(dateStr.split('-')[2], 10);
@@ -149,25 +146,6 @@ export default function StatsPage() {
             <Typography variant="h6" fontWeight={700} color="primary">{totalCompleted}</Typography>
           </Box>
         </CardContent>
-      </Card>
-
-      {/* Today's entry — no icon, no title */}
-      <Card sx={{ mb: 3 }}>
-        <Box sx={{ px: 2, py: 1.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.75 }}>
-            <Typography variant="body2" fontWeight={500}>{formatDate(TODAY)}</Typography>
-            <Box sx={{ ml: 'auto' }}>
-              <Typography variant="caption" color={todayCount === TOTAL_EXERCISES ? 'success.main' : 'text.secondary'} fontWeight={600}>
-                {todayCount === TOTAL_EXERCISES ? 'Complete ✓' : `${todayCount} / ${TOTAL_EXERCISES}`}
-              </Typography>
-            </Box>
-          </Box>
-          <LinearProgress
-            variant="determinate"
-            value={Math.round((todayCount / TOTAL_EXERCISES) * 100)}
-            sx={{ height: 4, borderRadius: 2, bgcolor: 'action.hover', '& .MuiLinearProgress-bar': { borderRadius: 2, bgcolor: todayCount === TOTAL_EXERCISES ? 'success.main' : 'primary.main' } }}
-          />
-        </Box>
       </Card>
 
       {/* Monthly calendar with navigation */}
