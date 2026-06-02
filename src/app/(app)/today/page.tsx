@@ -38,6 +38,7 @@ export default function TodayPage() {
   const completed = useCompleted(TODAY);
   const [celebrating, setCelebrating] = useState(false);
   const prevAllDone = useRef(false);
+  const hasShownCelebration = useRef(false);
 
   const exercises = mockProgram.exercises.map((pe) => ({
     pe,
@@ -48,8 +49,9 @@ export default function TodayPage() {
   const allDone = doneCount === exercises.length;
 
   useEffect(() => {
-    if (allDone && !prevAllDone.current) {
+    if (allDone && !prevAllDone.current && !hasShownCelebration.current) {
       setCelebrating(true);
+      hasShownCelebration.current = true;
     }
     prevAllDone.current = allDone;
   }, [allDone]);
